@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 func init() {
@@ -38,6 +39,14 @@ func main() {
 			defer wg.Done()
 			if e = download(url); e != nil {
 				fmt.Fprintln(os.Stderr, url+" failed:", e.Error())
+
+				var retry = 0
+				for e != nil && retry < 9 {
+					retry++
+					fmt.Println("retry:", "[", retry, "]", url)
+					os.Remove("./" + fileName)
+					e = download(url)
+				}
 			}
 		}()
 	}
@@ -47,7 +56,10 @@ func main() {
 func download(url string) error {
 	fmt.Println(url)
 
-	resp, e := http.Get(url)
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+	resp, e := client.Get(url)
 	if e != nil {
 		return e
 	}
