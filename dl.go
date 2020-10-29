@@ -41,7 +41,7 @@ func main() {
 				fmt.Fprintln(os.Stderr, url+" failed:", e.Error())
 
 				var retry = 0
-				for e != nil && retry < 9 {
+				for e != nil && retry < 20 {
 					retry++
 					fmt.Println("retry:", "[", retry, "]", url)
 					os.Remove("./" + fileName)
